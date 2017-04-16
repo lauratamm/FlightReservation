@@ -4,7 +4,6 @@ import javax.swing.JOptionPane;
 
 import controller.FlightController;
 import controller.FlightControllerInterface;
-import model.Flight;
 
 public class UserInterface {
 	public void displayMenu() {
@@ -12,10 +11,6 @@ public class UserInterface {
 		Integer userInput;
 		
 		FlightControllerInterface flight = new FlightController();
-		
-		//Flight flight = new FlightInterface();
-		//flight.getFlightNumber();
-		//flightB.getFlightNumber();
 		
 		System.out.println(flight.getFlightNumber());
 		

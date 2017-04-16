@@ -1,12 +1,14 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Airline {
+public class Airline implements Model {
 	public String airlineName;
-	public ArrayList <Flight> allFlightsForAirline = new ArrayList<Flight>();
+	public List <Flight> allFlightsForAirline = new ArrayList<Flight>();
 	
 	public Airline (String airlineName){
 		this.airlineName=airlineName;
-	};
+	}
 }
+	

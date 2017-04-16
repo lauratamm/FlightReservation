@@ -1,5 +1,6 @@
 package controller;
 
+import model.Flight;
 import model.Passenger;
 
 public interface FlightControllerInterface {
@@ -21,5 +22,8 @@ public interface FlightControllerInterface {
 	public String getDestination();
 	
 	public void setDestination(String destination);
-
+	
+	public String getAllPassengers(Flight flight);
+	
+	public void validateFlight(String flightNumber, String takeoffTime,String landingTime, String departsFrom, String destination,String airline);
 }

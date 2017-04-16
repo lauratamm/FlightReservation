@@ -1,5 +1,5 @@
 package enumerator;
 
-public enum DeptDest {
+public enum Locations {
 	LONDON, EDINBURGH, TORONTO, NEWYORK, SYDNEY, BERLIN, HONGKONG;
 }

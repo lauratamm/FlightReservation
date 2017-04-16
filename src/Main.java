@@ -1,31 +1,31 @@
-import javax.swing.JOptionPane;
-
 import controller.AirlineController;
-import controller.AirlineControllerInterface;
 import controller.BookingController;
-import controller.BookingControllerInterface;
 import controller.FlightController;
-import controller.FlightControllerInterface;
 import controller.PassengerController;
-import controller.PassengerControllerInterface;
-import controller.SystemController;
-import controller.SystemControllerInterface;
-import model.Flight;
-import model.ReservationSystem;
-import view.UserInterface;
+import view.UserGUI;
+
 
 public class Main  {
-	AirlineControllerInterface airlineController = new AirlineController();
-	BookingControllerInterface bookingController = new BookingController();
-	FlightControllerInterface flightController = new FlightController();
-	PassengerControllerInterface passengerController = new PassengerController();
-	SystemControllerInterface systemController = new SystemController();
-	static UserInterface userInterface = new UserInterface();
-	
-	//public static void main(String[] args) {
-	//	userInterface.displayMenu();	
-	//}
+	/**
+	 * Launch the application.
+	 */
 	
 	
-	
+
+	public static void main(String[] args) {	
+		AirlineController airlineController = new AirlineController();
+		BookingController bookingController = new BookingController();
+		FlightController flightController = new FlightController();
+		PassengerController passengerController = new PassengerController();
+		
+		try {					
+			UserGUI window = new UserGUI(airlineController, bookingController, flightController, passengerController);
+			window.frame.setVisible(true);	
+			airlineController.addObserver(window);
+			bookingController.addObserver(window);
+			flightController.addObserver(window);					
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+};
 }
