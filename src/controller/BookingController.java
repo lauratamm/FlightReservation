@@ -2,6 +2,7 @@ package controller;
 
 import java.util.Date;
 
+import enumerator.PassengerClass;
 import model.Booking;
 import model.Flight;
 import model.Passenger;
@@ -30,6 +31,7 @@ public class BookingController extends AbstractController{
 	}
 	
 	public String validateBooking (String flightDept, String flightDest, Date flightDate, String firstName, String lastName, String passengerClass){
+		PassengerClass pClass = PassengerClass.valueOf(passengerClass);
 		Flight flight = flightController.findFlight(flightDept, flightDest, flightDate);
 		Passenger passenger = passengerController.findPassenger(firstName, lastName);
 		if (passenger !=null) {
@@ -41,7 +43,7 @@ public class BookingController extends AbstractController{
 			}
 		else {
 			System.out.println("new passenger");
-			Passenger newPassenger = passengerController.addPassenger(firstName, lastName, passengerClass);
+			Passenger newPassenger = passengerController.addPassenger(firstName, lastName, pClass);
 			addBooking(newPassenger, flight);
 			return "Booking completed";
 		}

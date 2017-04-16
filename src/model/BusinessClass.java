@@ -1,10 +1,12 @@
 package model;
 
+import enumerator.PassengerClass;
+
 public class BusinessClass extends Passenger {
 	
-	String passengerClass;
+	PassengerClass passengerClass;
 	
-	public BusinessClass (String firstname, String lastname, String passengerClass) {
+	public BusinessClass (String firstname, String lastname, PassengerClass passengerClass) {
 		super (firstname, lastname);
 		this.passengerClass = passengerClass;
 	}

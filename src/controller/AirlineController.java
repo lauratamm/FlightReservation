@@ -1,5 +1,6 @@
 package controller;
 
+import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,36 +10,61 @@ import model.Model;
 
 public class AirlineController extends AbstractController {
 	
-	public static List<Airline> allAirlines = new  ArrayList<>();
+	private List<Airline> allAirlines = new  ArrayList<>();
 	
-	private Airline airline;
+	
+	
 
-	public String getAirlineName() {
+	public String getAirlineName(Airline airline) {
 		return airline.airlineName;
 	}
-	public void setAirlineName(String airlineName) {
-		airline.airlineName = airlineName;
+	public void setAirlineName(Airline newAirline, String airlineName) {
+		newAirline.airlineName = airlineName;
 	}
 
-	public void addFlightsToAirline(Flight flight) {
+	public void addFlightsToAirline(Airline airline, Flight flight) {
 		airline.allFlightsForAirline.add(flight);
 	}
 	
 	public List<Airline> getAllAirlines() {
 		return allAirlines;	
 	}
-
-	public void validateNotEmpty(String airlineName) {
-		if (airlineName != null) {
-			Airline newAirline = new Airline (airlineName);
-			System.out.println(newAirline.airlineName + "in validation method");
-			allAirlines.add(airline);
-			//serialize(allAirlines);
-			setChanged();
-			notifyObservers();
+	
+	public Object[] getAllAirlineNames() {
+		ArrayList<String> airlineNames = new ArrayList<String>();
+		for (Airline tempAirline : getAllAirlines()){			
+			airlineNames.add(tempAirline.airlineName);			
 		}
-		else reportError("Enter airline name");
+		return airlineNames.toArray();
 	}
 	
+	private void addAirline(String airlineName) {
+		Airline newAirline = new Airline (airlineName);
+		allAirlines.add(newAirline);
+		System.out.println("airline added");
+		//serialize(allAirlines);
+		setChanged();
+		notifyObservers();
+	}
+
+	public boolean validateNotEmpty(String airlineName) {
+		if (!airlineName.isEmpty() ) {
+			addAirline(airlineName);
+			return true;
+		}
+		else {			
+			return false;
+		}
+	}
+	
+	public Airline findAirline(String airlineName){
+		for (Airline tempAirline: allAirlines){
+			if (tempAirline.airlineName.equals(airlineName)){
+				return tempAirline;
+			}
+		}
+		return null;
+	}
+
 	
 }

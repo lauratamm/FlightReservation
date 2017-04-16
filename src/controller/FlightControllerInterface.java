@@ -1,11 +1,13 @@
 package controller;
 
+import java.util.Date;
+
 import model.Flight;
 import model.Passenger;
 
 public interface FlightControllerInterface {
 	
-	public String getFlightNumber() ;
+	public String getFlightNumber(Flight flight) ;
 	
 	public void addPassengerToFlight (Passenger p);
 	

@@ -7,6 +7,8 @@ public class Airline implements Model {
 	public String airlineName;
 	public List <Flight> allFlightsForAirline = new ArrayList<Flight>();
 	
+	public Airline(){};
+	
 	public Airline (String airlineName){
 		this.airlineName=airlineName;
 	}

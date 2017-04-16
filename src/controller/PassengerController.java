@@ -2,6 +2,8 @@ package controller;
 
 import java.util.ArrayList;
 
+import enumerator.PassengerClass;
+import model.Airline;
 import model.Booking;
 import model.BusinessClass;
 import model.Flight;
@@ -47,7 +49,7 @@ public class PassengerController extends AbstractController implements Passenger
 	}
 	
 	public boolean isPassengerEligibleToBook (Passenger passenger, Flight flight) {// pass the flight into this as well pal
-		String airline = flight.airline;
+		Airline airline = flight.airline;
 		int bookingsPerAirline = 0;
 		for (Booking tempBooking: passenger.bookings) {
 			if (tempBooking.flight.airline == airline) {
@@ -76,13 +78,13 @@ public class PassengerController extends AbstractController implements Passenger
 	}
 		
 	
-	public Passenger addPassenger (String firstName,  String lastName, String passengerClass) {
-		if (passengerClass == "Business") {
-			Passenger passenger = new BusinessClass(firstName, lastName, passengerClass);
+	public Passenger addPassenger (String firstName,  String lastName, PassengerClass passengerClass) {
+		if (passengerClass == PassengerClass.BUSINESS) {
+			Passenger passenger = new BusinessClass(firstName, lastName, PassengerClass.BUSINESS);
 			
 			return passenger;
 			}
-		else {Passenger passenger = new StandardClass(firstName, lastName, passengerClass);
+		else {Passenger passenger = new StandardClass(firstName, lastName, PassengerClass.STANDARD);
 			return passenger;
 		}
 	}		

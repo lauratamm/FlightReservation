@@ -13,17 +13,11 @@ public class Main  {
 	
 
 	public static void main(String[] args) {	
-		AirlineController airlineController = new AirlineController();
-		BookingController bookingController = new BookingController();
-		FlightController flightController = new FlightController();
-		PassengerController passengerController = new PassengerController();
+		
 		
 		try {					
-			UserGUI window = new UserGUI(airlineController, bookingController, flightController, passengerController);
-			window.frame.setVisible(true);	
-			airlineController.addObserver(window);
-			bookingController.addObserver(window);
-			flightController.addObserver(window);					
+			UserGUI window = new UserGUI();
+			window.frame.setVisible(true);					
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
