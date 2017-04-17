@@ -8,6 +8,7 @@ import java.awt.SystemColor;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
@@ -27,13 +28,16 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.table.DefaultTableModel;
 
+import controller.AbstractController;
 import controller.AirlineController;
 import controller.BookingController;
 import controller.FlightController;
+import controller.FlightControllerInterface;
 import controller.PassengerController;
 import enumerator.Locations;
 import model.Airline;
 import model.Flight;
+import java.text.DateFormat;
 
 public class UserGUI implements Observer {
 
@@ -95,6 +99,7 @@ public class UserGUI implements Observer {
 	BookingController bookingController = new BookingController();
 	FlightController flightController = new FlightController();
 	PassengerController passengerController = new PassengerController();
+	
 
 
 	/* Create the application.
@@ -104,6 +109,7 @@ public class UserGUI implements Observer {
 		bookingController.addObserver(this);
 		flightController.addObserver(this);
 		passengerController.addObserver(this);
+	
 		initialize();
 	}
 
@@ -114,16 +120,17 @@ public class UserGUI implements Observer {
 	
 
 	private void initialize() {		
+		airlineController.allAirlines.addAll(airlineController.deserialize(airlineController.allAirlines, "allAirlines.data"));		
 		frame = new JFrame();
 		frame.getContentPane().setLayout(null);
 
-		frame.setBounds(100, 100, 502, 392);
+		frame.setBounds(100, 100, 572, 392);
 		frame.setTitle("Flight Reservations");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		lblFlightReservationSystem = new JLabel("Flight Reservation System");
 		lblFlightReservationSystem.setFont(new Font("Verdana", Font.BOLD, 13));
-		lblFlightReservationSystem.setBounds(124, 11, 234, 44);
+		lblFlightReservationSystem.setBounds(188, 11, 234, 44);
 		frame.getContentPane().add(lblFlightReservationSystem);
 
 		//instantiate card layout
@@ -152,7 +159,7 @@ public class UserGUI implements Observer {
 
 		//instantiate menu buttons
 		btnManageFlights = new JButton("Manage Flights");
-		btnManageFlights.setBounds(10, 69, 135, 35);
+		btnManageFlights.setBounds(22, 69, 135, 35);
 		frame.getContentPane().add(btnManageFlights);
 		btnManageFlights.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -161,7 +168,7 @@ public class UserGUI implements Observer {
 		});
 
 		btnManageAirlines = new JButton("Manage Airlines");
-		btnManageAirlines.setBounds(165, 69, 135, 35);
+		btnManageAirlines.setBounds(202, 69, 135, 35);
 		frame.getContentPane().add(btnManageAirlines);
 		btnManageAirlines.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -170,7 +177,7 @@ public class UserGUI implements Observer {
 		});
 
 		btnManagePassengers = new JButton("Manage Passengers");
-		btnManagePassengers.setBounds(320, 69, 156, 35);
+		btnManagePassengers.setBounds(378, 69, 156, 35);
 		frame.getContentPane().add(btnManagePassengers);
 		btnManagePassengers.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -180,20 +187,20 @@ public class UserGUI implements Observer {
 
 		//separator of menu and content
 		separator = new JSeparator();
-		separator.setBounds(10, 114, 445, 2);
+		separator.setBounds(10, 115, 536, 1);
 		frame.getContentPane().add(separator);
 
 		//content for 'manage airlines'
 		lblAirlineCard = new JLabel("Manage Airlines:");
-		lblAirlineCard.setBounds(178, 16, 105, 29);
+		lblAirlineCard.setBounds(222, 11, 105, 29);
 		lblAirlineCard.setFont(new Font("Tahoma", Font.BOLD, 12));
 
 		allAirlinesTarget = new JTextArea("");
-		allAirlinesTarget.setBounds(207, 60, 219, 127);
+		allAirlinesTarget.setBounds(135, 49, 279, 127);
 		airlineCard.add(allAirlinesTarget);
 
 		btnViewAllAirlines = new JButton("View All Airlines");
-		btnViewAllAirlines.setBounds(24, 60, 133, 23);
+		btnViewAllAirlines.setBounds(138, 187, 133, 23);
 		btnViewAllAirlines.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				displayAllAirlines();
@@ -203,7 +210,7 @@ public class UserGUI implements Observer {
 
 		btnAddAirline = new JButton("Add Airline");
 		btnAddAirline.setForeground(new Color(0, 128, 0));
-		btnAddAirline.setBounds(24, 107, 133, 23);
+		btnAddAirline.setBounds(281, 187, 133, 23);
 		btnAddAirline.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchAirlinePopup();
@@ -212,7 +219,7 @@ public class UserGUI implements Observer {
 
 		//content for 'manage flights'
 		lblFlightCard = new JLabel("Manage Flights:");
-		lblFlightCard.setBounds(188, 11, 105, 29);
+		lblFlightCard.setBounds(227, 11, 105, 29);
 		lblFlightCard.setFont(new Font("Tahoma", Font.BOLD, 12));
 
 		btnViewAllFlights = new JButton("View All Flights");
@@ -236,16 +243,15 @@ public class UserGUI implements Observer {
 		txtSelectAFlight.setFont(new Font("Tahoma", Font.ITALIC, 12));
 		txtSelectAFlight.setBackground(SystemColor.menu);
 		txtSelectAFlight.setLineWrap(true);
-		txtSelectAFlight.setBounds(24, 141, 133, 34);
 
 
-		tableModel = new DefaultTableModel(4 , 0);	
+		tableModel = new DefaultTableModel(5 , 5);	
 		table = new JTable(tableModel);
 		table.setShowVerticalLines(false);
 		table.setShowGrid(false);
-		table.setBounds(187, 65, 253, 138);
+		table.setBounds(191, 64, 336, 138);
 		flightCard.add(table);
-
+		
 		JButton viewPassengers = new JButton("View Passengers");
 		viewPassengers.setBounds(24, 180, 133, 23);
 		viewPassengers.addActionListener(new ActionListener() {
@@ -257,12 +263,12 @@ public class UserGUI implements Observer {
 
 		//content for 'manage passengers'
 		lblPassengerCard = new JLabel("Manage Passengers:");
-		lblPassengerCard.setBounds(178, 16, 140, 29);
+		lblPassengerCard.setBounds(209, 11, 140, 29);
 		lblPassengerCard.setFont(new Font("Tahoma", Font.BOLD, 12));
 
 		btnMakeABooking = new JButton("Make a Booking");
 		btnMakeABooking.setForeground(new Color(0, 128, 0));
-		btnMakeABooking.setBounds(166, 68, 152, 38);
+		btnMakeABooking.setBounds(197, 65, 152, 38);
 		btnMakeABooking.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchBookingPopup();
@@ -272,7 +278,7 @@ public class UserGUI implements Observer {
 
 		btnCancelABooking = new JButton("Cancel a Booking");
 		btnCancelABooking.setForeground(new Color(255, 0, 0));
-		btnCancelABooking.setBounds(166, 117, 152, 38);
+		btnCancelABooking.setBounds(197, 126, 152, 38);
 		btnCancelABooking.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 			}
@@ -409,7 +415,6 @@ public class UserGUI implements Observer {
 				return;
 			}
 		
-			flightController.validateFlight(flightNumber, date, takeoffTime, landingTime, departsFrom, destination, airline);
 			if(!flightController.validateFlight(flightNumber,date, takeoffTime, landingTime, departsFrom, destination, airline)) {
 				reportError("Invalid entry");
 				launchFlightPopup();
@@ -437,14 +442,17 @@ public class UserGUI implements Observer {
 
 		//display flights in a table row
 		for (int i =0; i < flightController.getAllFlightNumbers().size(); i++) {
-			
+			System.out.println(flightController.getAllFlightNumbers().size());
 			String flightnumber = flightController.getFlight(i).flightNumber;
 			String depart = flightController.getFlight(i).departsFrom;
 			String destination = flightController.getFlight(i).destination;
-			String a = flightController.getFlight(i).flightNumber;
-			//System.out.println(flightnumber);
 			
-			Object[] data = {flightnumber, depart, destination, a};
+			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+			DateFormat timeFormat = new SimpleDateFormat("HH:mm");
+			String date = dateFormat.format(flightController.getFlight(i).takeOffTime);
+			String time = timeFormat.format(flightController.getFlight(i).takeOffTime); 
+			
+			Object[] data = {flightnumber, depart, destination, date, time};
 			tableModel.insertRow(i, data);
 		}
 	}
@@ -558,7 +566,7 @@ public class UserGUI implements Observer {
 
 			String flightDept = selectDeparture.getSelectedItem().toString();
 			String flightDest = selectDestination.getSelectedItem().toString();
-			//SimpleDateFormat flightDate = ;
+			
 			String firstName = AddPassengerFirstname.getText();
 			String lastName = AddPassengerLastname.getText();
 			String passengerClass = selectClass.getSelection().getActionCommand().toUpperCase();

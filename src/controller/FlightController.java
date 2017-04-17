@@ -12,6 +12,9 @@ import model.Passenger;
 
 public class FlightController extends AbstractController {
 
+	public DateFormat df = new SimpleDateFormat("dd/MM/yyyy/hh:mm");
+	
+	
 	Flight flight;
 	AirlineController airlineController =  new AirlineController();
 
@@ -97,7 +100,7 @@ public class FlightController extends AbstractController {
 		Date parsedDepartureTime;
 		Date parsedLandingTime;
 
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy/hh:mm");
+		
 
 		try {
 			parsedDepartureTime = df.parse(dateAndDepartureTime);
@@ -118,6 +121,7 @@ public class FlightController extends AbstractController {
 	private void createFlight(String flightNumber, String departsFrom, String destination, Airline airline, Date takeOffTime, Date landingTime){
 		Flight newFlight = new Flight (flightNumber, departsFrom, destination,airline, takeOffTime , landingTime);
 		allFlights.add(newFlight);
+		System.out.println("flight added");
 		setChanged();
 		notifyObservers();
 	}

@@ -19,10 +19,10 @@ import model.Passenger;
 public class FlightControllerTest {
 	FlightController flightController = new FlightController();
 	AirlineController airlineController = new AirlineController();
-	
+	DateFormat df = new SimpleDateFormat("dd/MM/yyyy/hh:mm");
 	@Test
 	public void testAddPassengerToFlight() throws ParseException {
-		DateFormat df = new SimpleDateFormat("dd/MM/yyyy/hh:mm");
+		
 		Flight flight = new Flight ();
 		String flightNumber = "ABC123";
 		Airline airline = new Airline("Ryanair");

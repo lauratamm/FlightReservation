@@ -1,6 +1,7 @@
 package controller;
 
 import java.awt.Window;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,9 +9,9 @@ import model.Airline;
 import model.Flight;
 import model.Model;
 
-public class AirlineController extends AbstractController {
+public class AirlineController extends AbstractController implements Serializable {
 	
-	private List<Airline> allAirlines = new  ArrayList<>();
+	public List<Airline> allAirlines = new  ArrayList<>();
 	
 	
 	
@@ -42,7 +43,7 @@ public class AirlineController extends AbstractController {
 		Airline newAirline = new Airline (airlineName);
 		allAirlines.add(newAirline);
 		System.out.println("airline added");
-		//serialize(allAirlines);
+		serialize(allAirlines, "allAirlines.data");
 		setChanged();
 		notifyObservers();
 	}

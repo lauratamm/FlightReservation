@@ -16,12 +16,12 @@ import model.Model;
 public abstract class AbstractController extends Observable implements Serializable, Controller {
 
 	
-	public void serialize(List<Model> list) {
+	public void serialize(List list, String fileName) {
 		{
 		    // create output stream
 		    try {
-		      FileOutputStream out = new FileOutputStream(list.getClass().getName() + ".data");
-		      
+		      FileOutputStream out = new FileOutputStream(fileName);
+		      System.out.println( "  serialize");
 		      ObjectOutputStream objOut = new ObjectOutputStream(out);
 
 		      // write out object, flush stream and close output
@@ -34,21 +34,25 @@ public abstract class AbstractController extends Observable implements Serializa
 		    }
 		  }
 	}
-		  public void deserialize(List<Model> list) {
+		  public List deserialize(List list, String fileName) {
 		    // create input stream
 		    try {
-		      FileInputStream in = new FileInputStream(list.getClass().getName()+ ".data");
+		      FileInputStream in = new FileInputStream(fileName);
+		      System.out.println( "  desearialize");
 		      ObjectInputStream objIn = new ObjectInputStream(in);
 
 		      // read in data and close input
-		      list = (List<Model>) objIn.readObject();
+		      list = (List) objIn.readObject();
 		      in.close();
+		      return list;
 		    }
 		    catch (IOException e) {
-		    	list = new ArrayList<Model>();
+		    	list = new ArrayList<>();
+		    	return list;
 		    }
 		    catch (ClassNotFoundException e) {
 		      reportError(e.toString());
+		      return null;
 		    }
 		  }
 		  
