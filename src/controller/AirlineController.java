@@ -42,7 +42,6 @@ public class AirlineController extends AbstractController implements Serializabl
 	private void addAirline(String airlineName) {
 		Airline newAirline = new Airline (airlineName);
 		allAirlines.add(newAirline);
-		System.out.println("airline added");
 		serialize(allAirlines, "allAirlines.data");
 		setChanged();
 		notifyObservers();

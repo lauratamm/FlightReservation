@@ -13,7 +13,7 @@ import model.StandardClass;
 public class PassengerController extends AbstractController implements PassengerControllerInterface {
 	
 	private Passenger passenger;
-	private ArrayList<Passenger> allPassengers = new ArrayList<Passenger>();
+	public ArrayList<Passenger> allPassengers = new ArrayList<Passenger>();
 
 	public String getFirstname() {
 		return passenger.firstname;
@@ -81,10 +81,12 @@ public class PassengerController extends AbstractController implements Passenger
 	public Passenger addPassenger (String firstName,  String lastName, PassengerClass passengerClass) {
 		if (passengerClass == PassengerClass.BUSINESS) {
 			Passenger passenger = new BusinessClass(firstName, lastName, PassengerClass.BUSINESS);
-			
+			serialize(allPassengers, "allPassengers.data");
 			return passenger;
 			}
-		else {Passenger passenger = new StandardClass(firstName, lastName, PassengerClass.STANDARD);
+		else {
+			Passenger passenger = new StandardClass(firstName, lastName, PassengerClass.STANDARD);
+			serialize(allPassengers, "allPassengers.data");
 			return passenger;
 		}
 	}		

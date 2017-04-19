@@ -1,11 +1,12 @@
 package model;
 
+import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class Flight implements Model {
+public class Flight implements Model, Serializable {
 	public String flightNumber;
 	public String departsFrom;
 	public String destination;

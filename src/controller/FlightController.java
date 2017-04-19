@@ -12,16 +12,18 @@ import model.Passenger;
 
 public class FlightController extends AbstractController {
 
-	public DateFormat df = new SimpleDateFormat("dd/MM/yyyy/hh:mm");
+	public DateFormat df = new SimpleDateFormat("dd/MM/yyyy/HH:mm");
 	
+	public DateFormat bookingDateFormat = new SimpleDateFormat("E dd/MM/yyyy  HH:mm");
 	
 	Flight flight;
 	AirlineController airlineController =  new AirlineController();
 
-	ArrayList <Flight> allFlights = new ArrayList <Flight>();
+	public ArrayList <Flight> allFlights = new ArrayList <Flight>();
 
 	public void addPassengerToFlight (Flight flight, Passenger passenger) {
-		flight.passengerList.add(passenger);		
+		flight.passengerList.add(passenger);	
+		//serialize(allFlights, "allFlights.data");
 	}
 
 	public Airline getAirline(Flight flight) {
@@ -71,13 +73,10 @@ public class FlightController extends AbstractController {
 
 
 	public String getAllPassengers(Flight flight) {
-		System.out.println(flight.flightNumber + "flightnumber inside method");
 		String output = "";
 		for (Passenger tempPassenger : flight.passengerList) {
-			System.out.println(tempPassenger.firstname + "temppassenger name");
 			output = output + tempPassenger.firstname +  "\n";
 		}		
-		//System.out.println(output + "  output");
 		return output;
 
 	}
@@ -86,7 +85,7 @@ public class FlightController extends AbstractController {
 	public boolean validateFlight(String flightNumber, String date, String takeoffTime, String landingTime, String departsFrom,
 			String destination, String airlineName) {
 
-
+		//validate fields not empty
 		if (flightNumber.isEmpty() || takeoffTime.isEmpty() || landingTime.isEmpty() || airlineName.isEmpty() ||date.isEmpty()) {
 			return false;
 		}
@@ -99,8 +98,6 @@ public class FlightController extends AbstractController {
 		String dateAndLandingTime = date + "/" + landingTime;
 		Date parsedDepartureTime;
 		Date parsedLandingTime;
-
-		
 
 		try {
 			parsedDepartureTime = df.parse(dateAndDepartureTime);
@@ -121,7 +118,7 @@ public class FlightController extends AbstractController {
 	private void createFlight(String flightNumber, String departsFrom, String destination, Airline airline, Date takeOffTime, Date landingTime){
 		Flight newFlight = new Flight (flightNumber, departsFrom, destination,airline, takeOffTime , landingTime);
 		allFlights.add(newFlight);
-		System.out.println("flight added");
+		serialize(allFlights, "allFlights.data");
 		setChanged();
 		notifyObservers();
 	}
@@ -133,11 +130,9 @@ public class FlightController extends AbstractController {
 	}
 
 	public ArrayList<String> getAllFlightNumbers() {
-		//System.out.println("getflightnumbers called");
 		ArrayList <String> allFlightNumbers = new ArrayList<String>();
-		for (Flight tempFlight : this.allFlights) {
+		for (Flight tempFlight : getFlightList()) {
 			allFlightNumbers.add(tempFlight.flightNumber);
-			System.out.println( tempFlight.flightNumber + "  inside getallflightnumbers");
 		}		
 		return allFlightNumbers;
 	}
@@ -148,10 +143,30 @@ public class FlightController extends AbstractController {
 
 
 
-	public Flight findFlight (String flightDept, String flightDest, Date flightDate) {
+	public Object[] findFlightTimes (String flightDept, String flightDest) {
+		System.out.println(allFlights.size() + "  findFlightTimes");
+		ArrayList<String> allMatchingFlights = new ArrayList<String>();
+		
 		for (Flight tempFlight: getFlightList()) {
-			//find the flight where the details match
-			if (tempFlight.takeOffTime == flightDate && tempFlight.departsFrom == flightDept && tempFlight.destination == flightDest) {
+			
+			//find flights where the details match
+			if ( tempFlight.departsFrom.equals(flightDept) && tempFlight.destination.equals(flightDest)) {
+				 allMatchingFlights.add(bookingDateFormat.format(tempFlight.takeOffTime));
+			}			
+		}
+		if (allMatchingFlights.size() !=0){
+			return allMatchingFlights.toArray();
+		}
+		else return null;
+	}
+	
+	
+	public Flight findFlight(String departsFrom,String destination, Date flightTime){
+	
+		System.out.println(getFlightList().size() + "length of allFlights");
+		System.out.println(allFlights.size()  +  "  length of flighlist from gui");
+		for (Flight tempFlight: allFlights) {		
+			if (tempFlight.takeOffTime.equals(flightTime) && tempFlight.departsFrom.equals(departsFrom) && tempFlight.destination.equals(destination)){
 				return tempFlight;
 			}
 		}

@@ -2,6 +2,7 @@ package view;
 
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.SystemColor;
@@ -9,6 +10,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
@@ -90,7 +92,7 @@ public class UserGUI implements Observer {
 	private JTextField textFieldAddTakeoffTime;
 	private JLabel lblAddFlightLandingTime;
 	private JTextField textFieldAddLandingTime;	
-
+	private JComboBox selectDate;
 	/**
 	 * Launch the application.
 	 */
@@ -99,6 +101,7 @@ public class UserGUI implements Observer {
 	BookingController bookingController = new BookingController();
 	FlightController flightController = new FlightController();
 	PassengerController passengerController = new PassengerController();
+	
 	
 
 
@@ -120,7 +123,9 @@ public class UserGUI implements Observer {
 	
 
 	private void initialize() {		
-		airlineController.allAirlines.addAll(airlineController.deserialize(airlineController.allAirlines, "allAirlines.data"));		
+		airlineController.allAirlines.addAll(airlineController.deserialize(airlineController.allAirlines, "allAirlines.data"));	
+		flightController.allFlights.addAll(flightController.deserialize(flightController.allFlights, "allFlights.data"));
+		passengerController.allPassengers.addAll(passengerController.deserialize(passengerController.allPassengers, "allPassengers.data"));	
 		frame = new JFrame();
 		frame.getContentPane().setLayout(null);
 
@@ -433,7 +438,6 @@ public class UserGUI implements Observer {
 	}
 
 	private void displayAllFlights() {
-		System.out.println("displayAllflights called");
 		//empty table
 		while (tableModel.getRowCount()>0)
 		{
@@ -442,7 +446,6 @@ public class UserGUI implements Observer {
 
 		//display flights in a table row
 		for (int i =0; i < flightController.getAllFlightNumbers().size(); i++) {
-			System.out.println(flightController.getAllFlightNumbers().size());
 			String flightnumber = flightController.getFlight(i).flightNumber;
 			String depart = flightController.getFlight(i).departsFrom;
 			String destination = flightController.getFlight(i).destination;
@@ -462,18 +465,14 @@ public class UserGUI implements Observer {
 		int column = 0;
 		int row = table.getSelectedRow();
 		String value = table.getModel().getValueAt(row, column).toString();
-		System.out.println(value + "  value");
 
 		for (Flight tempFlight: flightController.getFlightList()) {
 			if (tempFlight.flightNumber == value) {
-				System.out.println(tempFlight.flightNumber + "flightnumber");
 
 				allPassengersTarget = new JTextArea();
 				allPassengersTarget.setBackground(null);
 
-
 				String AllPassengersOutput=flightController.getAllPassengers(tempFlight);
-				System.out.println(AllPassengersOutput);
 				allPassengersTarget.setText(AllPassengersOutput + "\n");
 
 				lblAddFlightNumber = new JLabel("Flight number:  " + value);
@@ -501,6 +500,44 @@ public class UserGUI implements Observer {
 		JPanel bookingPanel = new JPanel(new GridLayout(0, 2, 10, 10));
 		bookingPanel.setBounds(10, 11, 249, 349);
 
+		JLabel lblDepartFrom = new JLabel("Depart from:");
+		lblDepartFrom.setBounds(10, 114, 95, 38);
+		bookingPanel.add(lblDepartFrom);
+
+		selectDeparture = new JComboBox(Locations.values());
+		selectDeparture.setBounds(115, 123, 124, 29);
+		bookingPanel.add(selectDeparture);
+
+		JLabel lblDestination = new JLabel("Destination:");
+		lblDestination.setBounds(10, 163, 95, 30);
+		bookingPanel.add(lblDestination);
+
+		selectDestination = new JComboBox(Locations.values());
+		selectDestination.setBounds(115, 168, 124, 30);
+		bookingPanel.add(selectDestination);
+
+		UIManager.put("OptionPane.okButtonText", "Find flights");
+
+		int result = JOptionPane.showConfirmDialog(frame, bookingPanel, 
+				"Find flights", JOptionPane.OK_CANCEL_OPTION);
+
+		if (result == JOptionPane.OK_OPTION) {
+
+			String flightDept = selectDeparture.getSelectedItem().toString();
+			String flightDest = selectDestination.getSelectedItem().toString();
+			
+			if (flightController.findFlightTimes(flightDept, flightDest) != null){
+				launchBookingStep2(flightDept, flightDest, flightController.findFlightTimes(flightDept, flightDest));
+			}
+			else reportError("No flights available for selected locations.");
+			
+		}
+	}
+	
+	private void launchBookingStep2 (String departsFrom,String destination, Object[] listOfFlightTimes){
+		JPanel bookingPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+		bookingPanel.setBounds(10, 11, 249, 349);
+
 		JLabel lblFirstname = new JLabel("First name");
 		lblFirstname.setBounds(10, 32, 95, 30);
 		bookingPanel.add(lblFirstname);		
@@ -518,26 +555,14 @@ public class UserGUI implements Observer {
 		AddPassengerLastname.setBounds(115, 78, 124, 25);
 		bookingPanel.add(AddPassengerLastname);
 		AddPassengerLastname.setColumns(10);
-
-		JLabel lblDepartFrom = new JLabel("Depart from:");
-		lblDepartFrom.setBounds(10, 114, 95, 38);
-		bookingPanel.add(lblDepartFrom);
-
-		selectDeparture = new JComboBox(Locations.values());
-		selectDeparture.setBounds(115, 123, 124, 29);
-		bookingPanel.add(selectDeparture);
-
-		JLabel lblDestination = new JLabel("Destination:");
-		lblDestination.setBounds(10, 163, 95, 30);
-		bookingPanel.add(lblDestination);
-
-		selectDestination = new JComboBox(Locations.values());
-		selectDestination.setBounds(115, 168, 124, 30);
-		bookingPanel.add(selectDestination);
-
+		
 		JLabel lblDate = new JLabel("Date: ");
 		lblDate.setBounds(10, 204, 95, 38);
 		bookingPanel.add(lblDate);
+		
+		selectDate = new JComboBox(listOfFlightTimes);
+		selectDate.setBounds(115, 168, 124, 30);
+		bookingPanel.add(selectDate);
 
 		JLabel lblSelectClass = new JLabel("Select class:");
 		lblSelectClass.setBounds(10, 251, 95, 26);
@@ -547,6 +572,11 @@ public class UserGUI implements Observer {
 		rdbtnBusiness.setActionCommand("Business");
 		rdbtnBusiness.setBounds(112, 253, 71, 24);
 		bookingPanel.add(rdbtnBusiness);
+		
+		lblSelectClass = new JLabel();
+		lblSelectClass.setBounds(10, 251, 95, 26);
+		bookingPanel.add(lblSelectClass);
+
 
 		JRadioButton rdbtnStandard = new JRadioButton("Standard");
 		rdbtnStandard.setActionCommand("Standard");
@@ -556,23 +586,25 @@ public class UserGUI implements Observer {
 		ButtonGroup selectClass = new ButtonGroup();
 		selectClass.add(rdbtnBusiness);
 		selectClass.add(rdbtnStandard);
-
-		UIManager.put("OptionPane.okButtonText", "Book");
-
+		
 		int result = JOptionPane.showConfirmDialog(frame, bookingPanel, 
-				"Make a booking", JOptionPane.OK_CANCEL_OPTION);
-
-		if (result == JOptionPane.OK_OPTION) {
-
-			String flightDept = selectDeparture.getSelectedItem().toString();
-			String flightDest = selectDestination.getSelectedItem().toString();
+				"Find flights", JOptionPane.OK_CANCEL_OPTION);
+		
+		if (result == JOptionPane.OK_OPTION){
 			
-			String firstName = AddPassengerFirstname.getText();
-			String lastName = AddPassengerLastname.getText();
-			String passengerClass = selectClass.getSelection().getActionCommand().toUpperCase();
-
-			//bookingController.validateBooking(flightDept, flightDest, flightDate, firstName, lastName, passengerClass );
+		String firstName = AddPassengerFirstname.getText();
+		String lastName = AddPassengerLastname.getText();
+		String time = selectDate.getSelectedItem().toString();
+		String passengerClass = selectClass.getSelection().getActionCommand().toUpperCase();
+		
+		
+		if (!bookingController.validateBooking(departsFrom, destination, time, firstName, lastName, passengerClass, flightController)){
+			reportError("Invalid entry");
+			launchBookingStep2(departsFrom, destination, listOfFlightTimes);
+			}
+		
 		}
+		
 	}
 
 	public void reportError (String message) {

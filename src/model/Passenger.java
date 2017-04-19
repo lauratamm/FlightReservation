@@ -1,9 +1,10 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public abstract class Passenger implements Model {
+public abstract class Passenger implements Model, Serializable {
 	public String firstname;
 	public String lastname;
 	public List<Booking> bookings = new ArrayList<Booking>();
