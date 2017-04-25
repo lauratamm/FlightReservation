@@ -6,92 +6,46 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import javax.swing.plaf.synth.SynthSpinnerUI;
+
 import model.Airline;
+import model.Booking;
 import model.Flight;
 import model.Passenger;
 
 public class FlightController extends AbstractController {
 
-	public DateFormat df = new SimpleDateFormat("dd/MM/yyyy/HH:mm");
+	private DateFormat dateFormatForFlightModel = new SimpleDateFormat("dd/MM/yyyy/HH:mm");	
+	private DateFormat dateFormatForBooking = new SimpleDateFormat("E dd/MM/yyyy  HH:mm");
+	private ArrayList <Flight> allFlights = new ArrayList <Flight>();
+	public String fileName = "allFlights.data";
+	//Singleton
+	private static FlightController flightController = null;
 	
-	public DateFormat bookingDateFormat = new SimpleDateFormat("E dd/MM/yyyy  HH:mm");
+	private FlightController() {}
 	
-	Flight flight;
-	AirlineController airlineController =  new AirlineController();
-
-	public ArrayList <Flight> allFlights = new ArrayList <Flight>();
-
-	public void addPassengerToFlight (Flight flight, Passenger passenger) {
-		flight.passengerList.add(passenger);	
-		//serialize(allFlights, "allFlights.data");
+	public static FlightController getInstance() {
+		if (flightController == null){
+			flightController = new FlightController();
+		}
+		return flightController;
 	}
 
-	public Airline getAirline(Flight flight) {
-		return flight.airline;
+	public void addPassengerToFlight (Flight flight, Booking booking) {
+		flight.getBookingListForFlight().add(booking);	
+		serialize(flightController.getFlightList(), this.fileName);
 	}
-
-	public void setAirline(Flight flight,Airline airline) {
-		flight.airline = airline;
-	}
-
-
-	public void setFlightNumber(Flight flight,String flightNumber) {
-		flight.flightNumber = flightNumber;
-	}
-	public String getDepartsFrom(Flight flight) {
-		return flight.departsFrom;
-	}
-	public void setDepartsFrom(Flight flight,String departsFrom) {
-		flight.departsFrom = departsFrom;
-	}
-	public String getDestination(Flight flight) {
-		return flight.destination;
-	}
-	public void setDestination(Flight flight,String destination) {
-		flight.destination = destination;
-	}
-
-	public void setDepartureTime(Flight flight,Date takeOffTime){
-		flight.takeOffTime=takeOffTime;
-	}
-
-	public Date getDepartureTime (Flight flight){
-		return flight.takeOffTime;
-	}
-
-	public void setLandingTime (Flight flight,Date landingTime){
-		flight.landingTime=landingTime;
-	}
-
-	public Date getLandingTime (Flight flight){
-		return flight.landingTime;
-	}
-
-	public String getFlightNumber(Flight flight) {
-		return flight.flightNumber;
-	}
-
-
-	public String getAllPassengers(Flight flight) {
-		String output = "";
-		for (Passenger tempPassenger : flight.passengerList) {
-			output = output + tempPassenger.firstname +  "\n";
-		}		
-		return output;
-
-	}
-
 
 	public boolean validateFlight(String flightNumber, String date, String takeoffTime, String landingTime, String departsFrom,
 			String destination, String airlineName) {
-
+		
 		//validate fields not empty
 		if (flightNumber.isEmpty() || takeoffTime.isEmpty() || landingTime.isEmpty() || airlineName.isEmpty() ||date.isEmpty()) {
 			return false;
 		}
 		
 		//find airline object by airline name
-		Airline airline = airlineController.findAirline(airlineName);
+		Airline airline = AirlineController.getInstance().findAirline(airlineName);
 		
 		//convert date strings into a date object
 		String dateAndDepartureTime = date + "/" + takeoffTime;
@@ -100,8 +54,8 @@ public class FlightController extends AbstractController {
 		Date parsedLandingTime;
 
 		try {
-			parsedDepartureTime = df.parse(dateAndDepartureTime);
-			parsedLandingTime = df.parse(dateAndLandingTime);
+			parsedDepartureTime = dateFormatForFlightModel.parse(dateAndDepartureTime);
+			parsedLandingTime = dateFormatForFlightModel.parse(dateAndLandingTime);
 			createFlight(flightNumber, departsFrom, destination,airline, parsedDepartureTime , parsedLandingTime);
 			return true;
 		} catch (ParseException e) {
@@ -117,8 +71,9 @@ public class FlightController extends AbstractController {
 
 	private void createFlight(String flightNumber, String departsFrom, String destination, Airline airline, Date takeOffTime, Date landingTime){
 		Flight newFlight = new Flight (flightNumber, departsFrom, destination,airline, takeOffTime , landingTime);
+		
 		allFlights.add(newFlight);
-		serialize(allFlights, "allFlights.data");
+		serialize(allFlights, this.fileName);
 		setChanged();
 		notifyObservers();
 	}
@@ -132,7 +87,7 @@ public class FlightController extends AbstractController {
 	public ArrayList<String> getAllFlightNumbers() {
 		ArrayList <String> allFlightNumbers = new ArrayList<String>();
 		for (Flight tempFlight : getFlightList()) {
-			allFlightNumbers.add(tempFlight.flightNumber);
+			allFlightNumbers.add(tempFlight.getFlightNumber());
 		}		
 		return allFlightNumbers;
 	}
@@ -144,14 +99,13 @@ public class FlightController extends AbstractController {
 
 
 	public Object[] findFlightTimes (String flightDept, String flightDest) {
-		System.out.println(allFlights.size() + "  findFlightTimes");
 		ArrayList<String> allMatchingFlights = new ArrayList<String>();
 		
 		for (Flight tempFlight: getFlightList()) {
 			
 			//find flights where the details match
-			if ( tempFlight.departsFrom.equals(flightDept) && tempFlight.destination.equals(flightDest)) {
-				 allMatchingFlights.add(bookingDateFormat.format(tempFlight.takeOffTime));
+			if ( tempFlight.getDepartsFrom().equals(flightDept) && tempFlight.getDestination().equals(flightDest)) {
+				 allMatchingFlights.add(dateFormatForBooking.format(tempFlight.getTakeOffTime()));
 			}			
 		}
 		if (allMatchingFlights.size() !=0){
@@ -163,14 +117,22 @@ public class FlightController extends AbstractController {
 	
 	public Flight findFlight(String departsFrom,String destination, Date flightTime){
 	
-		System.out.println(getFlightList().size() + "length of allFlights");
-		System.out.println(allFlights.size()  +  "  length of flighlist from gui");
-		for (Flight tempFlight: allFlights) {		
-			if (tempFlight.takeOffTime.equals(flightTime) && tempFlight.departsFrom.equals(departsFrom) && tempFlight.destination.equals(destination)){
+		for (Flight tempFlight: allFlights) {	
+		
+			if (tempFlight.getTakeOffTime().equals(flightTime) && tempFlight.getDepartsFrom().equals(departsFrom) 
+					&& tempFlight.getDestination().equals(destination)){	
 				return tempFlight;
 			}
 		}
 		return null;
+	}
+	
+	public DateFormat getDateFormatForFlightModel() {
+		return dateFormatForFlightModel;
+	}
+
+	public DateFormat getDateFormatForBooking() {
+		return dateFormatForBooking;
 	}
 
 }

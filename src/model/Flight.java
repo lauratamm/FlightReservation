@@ -7,14 +7,14 @@ import java.util.ArrayList;
 import java.util.Date;
 
 public class Flight implements Model, Serializable {
-	public String flightNumber;
-	public String departsFrom;
-	public String destination;
-	public Airline airline;
-	public Date takeOffTime;
-	public Date landingTime;
+	private String flightNumber;
+	private String departsFrom;
+	private String destination;
+	private Airline airline;
+	private Date takeOffTime;
+	private Date landingTime;
 	
-	public ArrayList<Passenger> passengerList= new ArrayList<Passenger>();
+	private ArrayList<Booking> bookingListForFlight= new ArrayList<Booking>();
 
 	public Flight (){};
 	
@@ -26,5 +26,58 @@ public class Flight implements Model, Serializable {
 		this.takeOffTime = takeOffTime;
 		this.landingTime = landingTime;
 		
+	}
+	
+	
+	public String getFlightNumber() {
+		return flightNumber;
+	}
+
+	public void setFlightNumber(String flightNumber) {
+		this.flightNumber = flightNumber;
+	}
+
+	public String getDepartsFrom() {
+		return departsFrom;
+	}
+
+	public void setDepartsFrom(String departsFrom) {
+		this.departsFrom = departsFrom;
+	}
+
+	public String getDestination() {
+		return destination;
+	}
+
+	public void setDestination(String destination) {
+		this.destination = destination;
+	}
+
+	public Airline getAirline() {
+		return airline;
+	}
+
+	public void setAirline(Airline airline) {
+		this.airline = airline;
+	}
+
+	public Date getTakeOffTime() {
+		return takeOffTime;
+	}
+
+	public void setTakeOffTime(Date takeOffTime) {
+		this.takeOffTime = takeOffTime;
+	}
+
+	public Date getLandingTime() {
+		return landingTime;
+	}
+
+	public void setLandingTime(Date landingTime) {
+		this.landingTime = landingTime;
+	}
+
+	public ArrayList<Booking> getBookingListForFlight() {
+		return bookingListForFlight;
 	}
 }

@@ -1,70 +1,71 @@
 package controller;
 
 import java.awt.Window;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
-
 import model.Airline;
 import model.Flight;
 import model.Model;
 
-public class AirlineController extends AbstractController implements Serializable {
-	
-	public List<Airline> allAirlines = new  ArrayList<>();
-	
-	
-	
+public class AirlineController extends AbstractController  {
 
-	public String getAirlineName(Airline airline) {
-		return airline.airlineName;
+	private List<Airline> allAirlines = new ArrayList<>();
+	public String fileName = "allAirlines.data";
+	
+	private static AirlineController airlineController = null;
+
+	private AirlineController() {
 	}
-	public void setAirlineName(Airline newAirline, String airlineName) {
-		newAirline.airlineName = airlineName;
+
+	public static AirlineController getInstance() {
+		if (airlineController == null) {
+			airlineController = new AirlineController();
+		}
+		return airlineController;
 	}
 
 	public void addFlightsToAirline(Airline airline, Flight flight) {
-		airline.allFlightsForAirline.add(flight);
+		airline.getAllFlightsForAirline().add(flight);
+	}
+
+	public List<Airline> getAirlineList() {
+		return this.allAirlines;
 	}
 	
-	public List<Airline> getAllAirlines() {
-		return allAirlines;	
-	}
-	
+	//get an array of airline names for the dropdown menu
 	public Object[] getAllAirlineNames() {
 		ArrayList<String> airlineNames = new ArrayList<String>();
-		for (Airline tempAirline : getAllAirlines()){			
-			airlineNames.add(tempAirline.airlineName);			
+		for (Airline tempAirline : getAirlineList()) {
+			airlineNames.add(tempAirline.getAirlineName());
 		}
 		return airlineNames.toArray();
 	}
-	
+
+	//add airline to list of airlines
 	private void addAirline(String airlineName) {
-		Airline newAirline = new Airline (airlineName);
-		allAirlines.add(newAirline);
-		serialize(allAirlines, "allAirlines.data");
+		Airline newAirline = new Airline(airlineName);
+		this.allAirlines.add(newAirline);
+		serialize(this.allAirlines, this.fileName);
 		setChanged();
 		notifyObservers();
 	}
 
-	public boolean validateNotEmpty(String airlineName) {
-		if (!airlineName.isEmpty() ) {
+	public boolean validateAirlineFieldNotEmpty(String airlineName) {
+		if (!airlineName.isEmpty()) {
 			addAirline(airlineName);
 			return true;
-		}
-		else {			
+		} else {
 			return false;
 		}
 	}
-	
-	public Airline findAirline(String airlineName){
-		for (Airline tempAirline: allAirlines){
-			if (tempAirline.airlineName.equals(airlineName)){
+
+	public Airline findAirline(String airlineName) {
+		for (Airline tempAirline : this.allAirlines) {
+			if (tempAirline.getAirlineName().equals(airlineName)) {
 				return tempAirline;
 			}
 		}
 		return null;
 	}
 
-	
 }

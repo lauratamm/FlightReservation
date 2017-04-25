@@ -3,16 +3,40 @@ package model;
 import java.io.Serializable;
 
 public class Booking implements Model, Serializable {
-	public int bookingRef;
-	public Passenger passenger;
-	public Flight flight;
-	
+	private int bookingRef;
+	private Passenger passenger;
+	private Flight flight;
+
+
 	public Booking(Passenger passenger, Flight flight) {
-		this.bookingRef= 1;
+		this.bookingRef = 1;
 		this.passenger = passenger;
 		this.flight = flight;
-		// using passenger and flight objects instead of setting and getting specific variables within constructor  
-	};
+	}
 	
-	
+
+	public int getBookingRef() {
+		return bookingRef;
+	}
+
+	public void setBookingRef(int bookingRef) {
+		this.bookingRef = bookingRef;
+	}
+
+	public Passenger getPassenger() {
+		return passenger;
+	}
+
+	public void setPassenger(Passenger passenger) {
+		this.passenger = passenger;
+	}
+
+	public Flight getFlight() {
+		return flight;
+	}
+
+	public void setFlight(Flight flight) {
+		this.flight = flight;
+	}
+
 }

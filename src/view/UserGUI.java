@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
-
 import javax.swing.ButtonGroup;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -28,17 +27,21 @@ import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.UIManager;
+import javax.swing.plaf.OptionPaneUI;
 import javax.swing.table.DefaultTableModel;
-
 import controller.AbstractController;
 import controller.AirlineController;
 import controller.BookingController;
 import controller.FlightController;
-import controller.FlightControllerInterface;
+
+import controller.FlightControllerTest;
 import controller.PassengerController;
 import enumerator.Locations;
 import model.Airline;
+import model.Booking;
 import model.Flight;
+import model.Passenger;
+
 import java.text.DateFormat;
 
 public class UserGUI implements Observer {
@@ -91,42 +94,47 @@ public class UserGUI implements Observer {
 	private JLabel lblAddFlightTakeoffTime;
 	private JTextField textFieldAddTakeoffTime;
 	private JLabel lblAddFlightLandingTime;
-	private JTextField textFieldAddLandingTime;	
+	private JTextField textFieldAddLandingTime;
 	private JComboBox selectDate;
-	/**
-	 * Launch the application.
-	 */
-
-	AirlineController airlineController = new AirlineController();
-	BookingController bookingController = new BookingController();
-	FlightController flightController = new FlightController();
-	PassengerController passengerController = new PassengerController();
+	private JPanel bookingPanel;
+	private JLabel lblBookingRef;
+	private JTextField textFieldBookingRef;
+	private JPanel cancelBookingPopup;
 	
-	
+	//instantiate controllers
+	AirlineController airlineController = AirlineController.getInstance();
+	BookingController bookingController = BookingController.getInstance();
+	FlightController flightController = FlightController.getInstance();
+	PassengerController passengerController = PassengerController.getInstance();
 
 
-	/* Create the application.
-	 */
+	//add GUI as an observer 
 	public UserGUI() {
 		airlineController.addObserver(this);
 		bookingController.addObserver(this);
 		flightController.addObserver(this);
 		passengerController.addObserver(this);
-	
+
 		initialize();
 	}
 
-	/**
-	 * Initialize the contents of the frame.
-	 * @return 
-	 */
-	
 
-	private void initialize() {		
-		airlineController.allAirlines.addAll(airlineController.deserialize(airlineController.allAirlines, "allAirlines.data"));	
-		flightController.allFlights.addAll(flightController.deserialize(flightController.allFlights, "allFlights.data"));
-		passengerController.allPassengers.addAll(passengerController.deserialize(passengerController.allPassengers, "allPassengers.data"));	
+	private void initialize() {
+		//deserialize 
+		airlineController.getAirlineList().addAll(airlineController.deserialize(airlineController.getAirlineList(), airlineController.fileName));
+		flightController.getFlightList().addAll(flightController.deserialize(flightController.getFlightList(), flightController.fileName));
+		passengerController.getPassengerList().addAll(passengerController.deserialize(passengerController.getPassengerList(), passengerController.fileName));
+		bookingController.getBookingList().addAll(bookingController.deserialize(bookingController.getBookingList(), bookingController.fileName));
+		System.out.println(bookingController.getBookingList().size() + "  size of booking list when deserialized");
+		
+		Booking booking = new Booking(null, null);
+		bookingController.getBookingList().add(booking);
+		for (Booking tempB: bookingController.getBookingList()){
+			System.out.println(tempB.getPassenger());
+		}
+		//initialize contents
 		frame = new JFrame();
+		frame.getContentPane().setBackground(SystemColor.controlHighlight);
 		frame.getContentPane().setLayout(null);
 
 		frame.setBounds(100, 100, 572, 392);
@@ -138,31 +146,34 @@ public class UserGUI implements Observer {
 		lblFlightReservationSystem.setBounds(188, 11, 234, 44);
 		frame.getContentPane().add(lblFlightReservationSystem);
 
-		//instantiate card layout
+		// instantiate card layout
 		cardLayout = new CardLayout();
 
-		//instantiate panel to contain cards
+		// instantiate panel to contain cards
 		cardPanel = new JPanel();
 		cardPanel.setBounds(0, 115, 550, 239);
 		frame.getContentPane().add(cardPanel);
 		cardPanel.setLayout(cardLayout);
 
-		//instantiate flight card
+		// instantiate flight card
 		flightCard = new JPanel();
+		flightCard.setBackground(SystemColor.controlHighlight);
 		cardPanel.add(flightCard, "flightCard");
 		flightCard.setLayout(null);
 
-		//instantiate airline card
+		// instantiate airline card
 		airlineCard = new JPanel();
+		airlineCard.setBackground(SystemColor.controlHighlight);
 		cardPanel.add(airlineCard, "airlineCard");
 		airlineCard.setLayout(null);
 
-		//instantiate passenger card
+		// instantiate passenger card
 		passengerCard = new JPanel();
+		passengerCard.setBackground(SystemColor.controlHighlight);
 		cardPanel.add(passengerCard, "passengerCard");
 		passengerCard.setLayout(null);
 
-		//instantiate menu buttons
+		// instantiate menu buttons
 		btnManageFlights = new JButton("Manage Flights");
 		btnManageFlights.setBounds(22, 69, 135, 35);
 		frame.getContentPane().add(btnManageFlights);
@@ -190,12 +201,12 @@ public class UserGUI implements Observer {
 			}
 		});
 
-		//separator of menu and content
+		// separator of menu and content
 		separator = new JSeparator();
 		separator.setBounds(10, 115, 536, 1);
 		frame.getContentPane().add(separator);
 
-		//content for 'manage airlines'
+		// content for 'manage airlines'
 		lblAirlineCard = new JLabel("Manage Airlines:");
 		lblAirlineCard.setBounds(222, 11, 105, 29);
 		lblAirlineCard.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -209,9 +220,8 @@ public class UserGUI implements Observer {
 		btnViewAllAirlines.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				displayAllAirlines();
-			}			
+			}
 		});
-
 
 		btnAddAirline = new JButton("Add Airline");
 		btnAddAirline.setForeground(new Color(0, 128, 0));
@@ -222,7 +232,7 @@ public class UserGUI implements Observer {
 			}
 		});
 
-		//content for 'manage flights'
+		// content for 'manage flights'
 		lblFlightCard = new JLabel("Manage Flights:");
 		lblFlightCard.setBounds(227, 11, 105, 29);
 		lblFlightCard.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -238,35 +248,34 @@ public class UserGUI implements Observer {
 		btnAddFlight = new JButton("Add Flight");
 		btnAddFlight.setForeground(new Color(0, 128, 0));
 		btnAddFlight.setBounds(24, 94, 133, 23);
-		btnAddFlight.addActionListener(new ActionListener() {	
+		btnAddFlight.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchFlightPopup();
 			}
 		});
 
-		txtSelectAFlight  = new JTextArea("Select a flight to view \n passengers:");
+		txtSelectAFlight = new JTextArea("Select a flight to view \n passengers:");
 		txtSelectAFlight.setFont(new Font("Tahoma", Font.ITALIC, 12));
 		txtSelectAFlight.setBackground(SystemColor.menu);
 		txtSelectAFlight.setLineWrap(true);
 
-
-		tableModel = new DefaultTableModel(5 , 5);	
+		tableModel = new DefaultTableModel(6, 6);
 		table = new JTable(tableModel);
-		table.setShowVerticalLines(false);
 		table.setShowGrid(false);
+		table.setBackground(Color.WHITE);
+		table.setShowVerticalLines(false);
 		table.setBounds(191, 64, 336, 138);
 		flightCard.add(table);
-		
+
 		JButton viewPassengers = new JButton("View Passengers");
-		viewPassengers.setBounds(24, 180, 133, 23);
+		viewPassengers.setBounds(24, 180, 157, 23);
 		viewPassengers.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				launchPassengersPopup();
 			}
 		});
 
-
-		//content for 'manage passengers'
+		// content for 'manage passengers'
 		lblPassengerCard = new JLabel("Manage Passengers:");
 		lblPassengerCard.setBounds(209, 11, 140, 29);
 		lblPassengerCard.setFont(new Font("Tahoma", Font.BOLD, 12));
@@ -276,25 +285,23 @@ public class UserGUI implements Observer {
 		btnMakeABooking.setBounds(197, 65, 152, 38);
 		btnMakeABooking.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				launchBookingPopup();
+				launchRoutePopup();
 			}
 		});
-
 
 		btnCancelABooking = new JButton("Cancel a Booking");
 		btnCancelABooking.setForeground(new Color(255, 0, 0));
 		btnCancelABooking.setBounds(197, 126, 152, 38);
 		btnCancelABooking.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
+				launchCancelBooking();
 			}
 		});
-
 
 		// add components to airline card
 		airlineCard.add(btnViewAllAirlines);
 		airlineCard.add(btnAddAirline);
 		airlineCard.add(lblAirlineCard);
-
 
 		// add components to flight card
 		flightCard.add(lblFlightCard);
@@ -308,7 +315,7 @@ public class UserGUI implements Observer {
 		passengerCard.add(btnMakeABooking);
 		passengerCard.add(btnCancelABooking);
 
-		//instantiate home card
+		// instantiate home card
 		homeCard = new JPanel();
 		homeCard.setBounds(0, 115, 464, 239);
 		frame.getContentPane().add(homeCard);
@@ -327,12 +334,11 @@ public class UserGUI implements Observer {
 
 		UIManager.put("OptionPane.okButtonText", "Add");
 
-		int result = JOptionPane.showConfirmDialog(null, addAirlinePopup, 
-				"Add airline", JOptionPane.OK_CANCEL_OPTION);
-		
-		if (result == JOptionPane.OK_OPTION) {	
-			if (!airlineController.validateNotEmpty(textFieldAddAirline.getText())) {
-				reportError("Enter airline name");
+		int result = JOptionPane.showConfirmDialog(null, addAirlinePopup, "Add airline", JOptionPane.OK_CANCEL_OPTION);
+
+		if (result == JOptionPane.OK_OPTION) {
+			if (!airlineController.validateAirlineFieldNotEmpty(textFieldAddAirline.getText())) {
+				reportMessage("Enter airline name");
 				launchAirlinePopup();
 			}
 		}
@@ -346,7 +352,7 @@ public class UserGUI implements Observer {
 		textFieldAddFlightNo.setBounds(24, 135, 133, 20);
 		textFieldAddFlightNo.setColumns(10);
 
-		lblAddDeparture = new JLabel("Departs from:" );
+		lblAddDeparture = new JLabel("Departs from:");
 		lblAddDeparture.setBounds(24, 110, 133, 14);
 
 		lblAddDestination = new JLabel("Destination:");
@@ -362,28 +368,28 @@ public class UserGUI implements Observer {
 		textFieldAddFlightAirline = new JComboBox(airlineController.getAllAirlineNames());
 		textFieldAddFlightAirline.setBounds(24, 135, 133, 20);
 
-		lblAddFlightDate = new JLabel ("Date (dd/MM/yy): ");
+		lblAddFlightDate = new JLabel("Date (dd/MM/yy): ");
 		lblAddFlightDate.setBounds(24, 110, 133, 14);
 
 		textFieldAddFlightDate = new JTextField();
 		textFieldAddFlightDate.setBounds(24, 135, 133, 20);
 		textFieldAddFlightDate.setColumns(10);
 
-		lblAddFlightTakeoffTime = new JLabel ("Departure time (hh:mm): ");
+		lblAddFlightTakeoffTime = new JLabel("Departure time (hh:mm): ");
 		lblAddFlightTakeoffTime.setBounds(24, 110, 133, 14);
 
 		textFieldAddTakeoffTime = new JTextField();
 		textFieldAddTakeoffTime.setBounds(24, 135, 133, 20);
 		textFieldAddTakeoffTime.setColumns(10);
 
-		lblAddFlightLandingTime = new JLabel ("Landing time (hh:mm): ");
+		lblAddFlightLandingTime = new JLabel("Landing time (hh:mm): ");
 		lblAddFlightLandingTime.setBounds(24, 110, 133, 14);
 
 		textFieldAddLandingTime = new JTextField();
 		textFieldAddLandingTime.setBounds(24, 135, 133, 20);
 		textFieldAddLandingTime.setColumns(10);
 
-		addFlightPopup = new JPanel(new GridLayout(0, 2,20,20));
+		addFlightPopup = new JPanel(new GridLayout(0, 2, 20, 20));
 		addFlightPopup.add(lblAddFlightNumber);
 		addFlightPopup.add(textFieldAddFlightNo);
 		addFlightPopup.add(lblAddDeparture);
@@ -401,8 +407,7 @@ public class UserGUI implements Observer {
 
 		UIManager.put("OptionPane.okButtonText", "Add");
 
-		int result = JOptionPane.showConfirmDialog(frame, addFlightPopup, 
-				"Add flight", JOptionPane.OK_CANCEL_OPTION);
+		int result = JOptionPane.showConfirmDialog(frame, addFlightPopup, "Add flight", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 			String flightNumber = textFieldAddFlightNo.getText();
 			String takeoffTime = textFieldAddTakeoffTime.getText();
@@ -412,50 +417,50 @@ public class UserGUI implements Observer {
 			String destination = destinationSelector.getSelectedItem().toString();
 			String airline;
 			try {
-				 airline= textFieldAddFlightAirline.getSelectedItem().toString();
-				 
-			}
-			catch (Exception e){
-				reportError("Create an airline before proceeding");
+				airline = textFieldAddFlightAirline.getSelectedItem().toString();
+
+			} catch (Exception e) {
+				reportMessage("Create an airline before proceeding");
 				return;
 			}
-		
-			if(!flightController.validateFlight(flightNumber,date, takeoffTime, landingTime, departsFrom, destination, airline)) {
-				reportError("Invalid entry");
+
+			if (!flightController.validateFlight(flightNumber, date, takeoffTime, landingTime, departsFrom, destination,
+					airline)) {
+				reportMessage("Invalid entry");
 				launchFlightPopup();
 			}
 		}
 	}
 
 	private void displayAllAirlines() {
-		if (airlineController.getAllAirlines() != null){
+		if (airlineController.getAirlineList() != null) {
 			String AllAirlinesOutput = "";
-			for (Airline tempAirline : airlineController.getAllAirlines()) {
-				AllAirlinesOutput = AllAirlinesOutput + tempAirline.airlineName + "\n";		
+			for (Airline tempAirline : airlineController.getAirlineList()) {
+				AllAirlinesOutput = AllAirlinesOutput + tempAirline.getAirlineName() + "\n";
 			}
 			allAirlinesTarget.setText(AllAirlinesOutput + "\n");
-		} 
+		}
 	}
 
 	private void displayAllFlights() {
-		//empty table
-		while (tableModel.getRowCount()>0)
-		{
+		// empty table
+		while (tableModel.getRowCount() > 0) {
 			tableModel.removeRow(0);
 		}
 
-		//display flights in a table row
-		for (int i =0; i < flightController.getAllFlightNumbers().size(); i++) {
-			String flightnumber = flightController.getFlight(i).flightNumber;
-			String depart = flightController.getFlight(i).departsFrom;
-			String destination = flightController.getFlight(i).destination;
-			
+		// display flights in a table row
+		for (int i = 0; i < flightController.getAllFlightNumbers().size(); i++) {
+			String flightnumber = flightController.getFlight(i).getFlightNumber();
+			String depart = flightController.getFlight(i).getDepartsFrom();
+			String destination = flightController.getFlight(i).getDestination();
+			String airline = flightController.getFlight(i).getAirline().getAirlineName();
+
 			DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 			DateFormat timeFormat = new SimpleDateFormat("HH:mm");
-			String date = dateFormat.format(flightController.getFlight(i).takeOffTime);
-			String time = timeFormat.format(flightController.getFlight(i).takeOffTime); 
-			
-			Object[] data = {flightnumber, depart, destination, date, time};
+			String date = dateFormat.format(flightController.getFlight(i).getTakeOffTime());
+			String time = timeFormat.format(flightController.getFlight(i).getLandingTime());
+
+			Object[] data = { flightnumber, depart, destination, date, time, airline };
 			tableModel.insertRow(i, data);
 		}
 	}
@@ -463,39 +468,54 @@ public class UserGUI implements Observer {
 	private void launchPassengersPopup() {
 
 		int column = 0;
-		int row = table.getSelectedRow();
-		String value = table.getModel().getValueAt(row, column).toString();
-
-		for (Flight tempFlight: flightController.getFlightList()) {
-			if (tempFlight.flightNumber == value) {
-
-				allPassengersTarget = new JTextArea();
-				allPassengersTarget.setBackground(null);
-
-				String AllPassengersOutput=flightController.getAllPassengers(tempFlight);
-				allPassengersTarget.setText(AllPassengersOutput + "\n");
-
-				lblAddFlightNumber = new JLabel("Flight number:  " + value);
-				lblAddFlightNumber.setBounds(24, 110, 133, 14);
-
-				viewPassengersPopup = new JPanel(new GridLayout(0, 1,10,10));
-				viewPassengersPopup.add(lblAddFlightNumber);
-				viewPassengersPopup.add(allPassengersTarget);
-
-				JOptionPane.showConfirmDialog(frame, viewPassengersPopup, 
-						"View Passengers", JOptionPane.DEFAULT_OPTION);
-
+			int row = table.getSelectedRow();
+			System.out.println(row);
+			String selectedFlightNumber;
+			try{
+				selectedFlightNumber = table.getModel().getValueAt(row, column).toString();
+		
+			for (Flight tempFlight : flightController.getFlightList()) {
+				if (tempFlight.getFlightNumber().equals(selectedFlightNumber)) {
+					System.out.println("matches");
+	
+					allPassengersTarget = new JTextArea();
+					allPassengersTarget.setBackground(null);
+	
+					String AllPassengersOutput = displayAllPassengers(tempFlight);
+					allPassengersTarget.setText(AllPassengersOutput + "\n");
+	
+					lblAddFlightNumber = new JLabel("Flight number:  " + selectedFlightNumber);
+					lblAddFlightNumber.setBounds(24, 110, 133, 14);
+	
+					viewPassengersPopup = new JPanel(new GridLayout(0, 1, 10, 10));
+					viewPassengersPopup.add(lblAddFlightNumber);
+					viewPassengersPopup.add(allPassengersTarget);
+	
+					JOptionPane.showConfirmDialog(frame, viewPassengersPopup, "View Passengers",
+							JOptionPane.DEFAULT_OPTION);
+	
+					}
+				
 			}
-
-			else {System.out.println("no passenger added");
 			}
-		}
+			catch (Exception e){
+					reportMessage("Please choose a flight.");
+				}
+		
+			
 	}
 
-	private void displayAllPassengers(){
+	private String displayAllPassengers(Flight flight) {
+		
+		String output = "";
+		for (Booking tempBooking : flight.getBookingListForFlight()) {
+			System.out.println("gets here 1");
+			output = output + tempBooking.getBookingRef() + "   " + tempBooking.getPassenger().getFirstname() + "  "+ tempBooking.getPassenger().getLastname() + "\n";
+		}	
+		return output;
 	}
 
-	private void launchBookingPopup() {
+	private void launchRoutePopup() {
 
 		JPanel bookingPanel = new JPanel(new GridLayout(0, 2, 10, 10));
 		bookingPanel.setBounds(10, 11, 249, 349);
@@ -518,29 +538,28 @@ public class UserGUI implements Observer {
 
 		UIManager.put("OptionPane.okButtonText", "Find flights");
 
-		int result = JOptionPane.showConfirmDialog(frame, bookingPanel, 
-				"Find flights", JOptionPane.OK_CANCEL_OPTION);
+		int result = JOptionPane.showConfirmDialog(frame, bookingPanel, "Find flights", JOptionPane.OK_CANCEL_OPTION);
 
 		if (result == JOptionPane.OK_OPTION) {
 
 			String flightDept = selectDeparture.getSelectedItem().toString();
 			String flightDest = selectDestination.getSelectedItem().toString();
-			
-			if (flightController.findFlightTimes(flightDept, flightDest) != null){
+
+			if (flightController.findFlightTimes(flightDept, flightDest) != null) {
 				launchBookingStep2(flightDept, flightDest, flightController.findFlightTimes(flightDept, flightDest));
-			}
-			else reportError("No flights available for selected locations.");
-			
+			} else
+				reportMessage("No flights available for selected locations.");
+
 		}
 	}
-	
-	private void launchBookingStep2 (String departsFrom,String destination, Object[] listOfFlightTimes){
-		JPanel bookingPanel = new JPanel(new GridLayout(0, 2, 10, 10));
+
+	private void launchBookingStep2(String departsFrom, String destination, Object[] listOfFlightTimes) {
+		bookingPanel = new JPanel(new GridLayout(0, 2, 10, 10));
 		bookingPanel.setBounds(10, 11, 249, 349);
 
 		JLabel lblFirstname = new JLabel("First name");
 		lblFirstname.setBounds(10, 32, 95, 30);
-		bookingPanel.add(lblFirstname);		
+		bookingPanel.add(lblFirstname);
 
 		AddPassengerFirstname = new JTextField();
 		AddPassengerFirstname.setBounds(115, 37, 124, 26);
@@ -555,11 +574,11 @@ public class UserGUI implements Observer {
 		AddPassengerLastname.setBounds(115, 78, 124, 25);
 		bookingPanel.add(AddPassengerLastname);
 		AddPassengerLastname.setColumns(10);
-		
+
 		JLabel lblDate = new JLabel("Date: ");
 		lblDate.setBounds(10, 204, 95, 38);
 		bookingPanel.add(lblDate);
-		
+
 		selectDate = new JComboBox(listOfFlightTimes);
 		selectDate.setBounds(115, 168, 124, 30);
 		bookingPanel.add(selectDate);
@@ -572,11 +591,10 @@ public class UserGUI implements Observer {
 		rdbtnBusiness.setActionCommand("Business");
 		rdbtnBusiness.setBounds(112, 253, 71, 24);
 		bookingPanel.add(rdbtnBusiness);
-		
+
 		lblSelectClass = new JLabel();
 		lblSelectClass.setBounds(10, 251, 95, 26);
 		bookingPanel.add(lblSelectClass);
-
 
 		JRadioButton rdbtnStandard = new JRadioButton("Standard");
 		rdbtnStandard.setActionCommand("Standard");
@@ -587,28 +605,42 @@ public class UserGUI implements Observer {
 		selectClass.add(rdbtnBusiness);
 		selectClass.add(rdbtnStandard);
 		
-		int result = JOptionPane.showConfirmDialog(frame, bookingPanel, 
-				"Find flights", JOptionPane.OK_CANCEL_OPTION);
-		
-		if (result == JOptionPane.OK_OPTION){
-			
-		String firstName = AddPassengerFirstname.getText();
-		String lastName = AddPassengerLastname.getText();
-		String time = selectDate.getSelectedItem().toString();
-		String passengerClass = selectClass.getSelection().getActionCommand().toUpperCase();
-		
-		
-		if (!bookingController.validateBooking(departsFrom, destination, time, firstName, lastName, passengerClass, flightController)){
-			reportError("Invalid entry");
-			launchBookingStep2(departsFrom, destination, listOfFlightTimes);
+		UIManager.put("OptionPane.okButtonText", "Book");
+
+		int result = JOptionPane.showConfirmDialog(frame, bookingPanel, "Find flights", JOptionPane.OK_CANCEL_OPTION);
+
+		if (result == JOptionPane.OK_OPTION) {
+
+			try {
+				String firstName = AddPassengerFirstname.getText();
+				String lastName = AddPassengerLastname.getText();
+				String time = selectDate.getSelectedItem().toString();
+				String passengerClass = selectClass.getSelection().getActionCommand().toUpperCase();
+
+				switch (bookingController.validateBooking(departsFrom, destination, time, firstName, lastName,
+						passengerClass)) {
+						case 1:
+							reportMessage("Please complete all fields.");
+							launchBookingStep2(departsFrom, destination, listOfFlightTimes);
+							break;
+						case 2:
+							reportMessage("Number of bookings exceeded!");
+							break;
+						case 3:
+							reportMessage("Booking successful!");
+							break;
+				}
+
+			} catch (Exception e) {
+				reportMessage("Please complete all fields");
+				launchBookingStep2(departsFrom, destination, listOfFlightTimes);
 			}
-		
 		}
-		
 	}
 
-	public void reportError (String message) {
-		JOptionPane.showMessageDialog(null, message, "Flight Reservation System", JOptionPane.ERROR_MESSAGE);
+	public void reportMessage(String message) {
+		UIManager.put("OptionPane.okButtonText", "OK");
+		JOptionPane.showMessageDialog(null, message, "Flight Reservation System", JOptionPane.INFORMATION_MESSAGE);
 	}
 
 	@Override
@@ -616,7 +648,31 @@ public class UserGUI implements Observer {
 		System.out.println("update called");
 		displayAllAirlines();
 		displayAllFlights();
-		displayAllPassengers();
+	}
+	
+	private void launchCancelBooking() {
+		lblBookingRef = new JLabel("Enter booking reference to cancel:");
+		lblBookingRef.setBounds(24, 110, 133, 14);
+		textFieldBookingRef = new JTextField();
+		textFieldBookingRef.setBounds(24, 135, 133, 20);
+		textFieldBookingRef.setColumns(10);
+
+		cancelBookingPopup = new JPanel();
+		cancelBookingPopup.add(lblBookingRef);
+		cancelBookingPopup.add(textFieldBookingRef);
+	
+		UIManager.put("OptionPane.cancelButtonText", "Back");
+		UIManager.put("OptionPane.okButtonText", "Cancel Booking");
+
+		int result = JOptionPane.showConfirmDialog(null, cancelBookingPopup, "Cancel Booking", JOptionPane.OK_CANCEL_OPTION);
+
+		if (result == JOptionPane.OK_OPTION) {
+			if (!bookingController.validateBookingRef(textFieldBookingRef.getText())) {
+				reportMessage("Invalid booking reference!");
+				launchCancelBooking();
+			}
+		}
+		
 	}
 
 }

@@ -4,11 +4,18 @@ import enumerator.PassengerClass;
 
 public class StandardClass extends Passenger {
 
-	PassengerClass passengerClass;
+	private PassengerClass passengerClass;
 	
 	public StandardClass (String firstname, String lastname, PassengerClass passengerClass) {
 		super (firstname, lastname);
 		this.passengerClass = passengerClass;
 	}
-	
+
+	public PassengerClass getPassengerClass() {
+		return passengerClass;
+	}
+
+	public void setPassengerClass(PassengerClass passengerClass) {
+		this.passengerClass = passengerClass;
+	}	
 }
