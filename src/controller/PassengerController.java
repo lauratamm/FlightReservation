@@ -3,6 +3,7 @@ package controller;
 import java.util.ArrayList;
 
 import enumerator.PassengerClass;
+import interfaces.PassengerClassInterface;
 import model.Airline;
 import model.Booking;
 import model.BusinessClass;
@@ -14,8 +15,7 @@ public class PassengerController extends AbstractController  {
 	
 	public String fileName= "allPassengers.data";
 	private ArrayList<Passenger> allPassengers = new ArrayList<Passenger>();
-	private static PassengerController passengerController = null;
-	
+	private static PassengerController passengerController = null;	
 	private PassengerController() {}
 	
 	public static PassengerController getInstance() {
@@ -25,16 +25,15 @@ public class PassengerController extends AbstractController  {
 		return passengerController;
 	}
 	
-	
-
 	public ArrayList<Passenger> getPassengerList() {
 		return PassengerController.getInstance().allPassengers;
 	}
 	
-	public Passenger findPassenger (String firstName, String lastName) {
+	public Passenger findPassenger (String firstName, String lastName, PassengerClass pClass) {
 		for (Passenger tempPassenger : 	getPassengerList()) {
 			//check if passenger exists
-			if ( firstName.equals(tempPassenger.getFirstname()) && lastName.equals(tempPassenger.getLastname())) {
+			if ( firstName.equals(tempPassenger.getFirstname()) && lastName.equals(tempPassenger.getLastname()) && 
+				pClass.equals(tempPassenger.getPassengerClass())) {
 				return tempPassenger;
 				}
 		}
@@ -42,23 +41,20 @@ public class PassengerController extends AbstractController  {
 				
 	}
 	
-	public boolean isPassengerEligibleToBook (Passenger passenger, Flight flight) {// pass the flight into this as well pal
-
-		System.out.println(passenger.getBookings().size() + "  in eligiblity");
+	public boolean isPassengerEligibleToBook (Passenger passenger, Flight flight) {
 		
 		Airline airline = flight.getAirline();
 		int bookingsPerAirline = 0;
 		
-		for (Booking tempBooking: passenger.getBookings()) {			
-			if (tempBooking.getFlight().getAirline().getAirlineName().equals(airline.getAirlineName())) {
+		for (Booking tempBooking: BookingController.getInstance().getBookingList()) {			
+			if (tempBooking.getPassenger().getFirstname().equals(passenger.getFirstname()) &&
+				tempBooking.getPassenger().getLastname().equals(passenger.getLastname()) &&
+				tempBooking.getFlight().getAirline().getAirlineName().equals(airline.getAirlineName())) {
 				bookingsPerAirline++;
 				}
 			}
 		
-		System.out.println(bookingsPerAirline + "  bookings per airline");
 		if (passenger instanceof BusinessClass ){
-			
-			System.out.println("business class");
 			if ( bookingsPerAirline<4 )	{
 			return true;
 				}
@@ -67,13 +63,10 @@ public class PassengerController extends AbstractController  {
 			}
 		}
 		else{ //if passenger is an instance of StandardClass
-			System.out.println("standard class");
 			if ( bookingsPerAirline<2 ){
-			System.out.println("returned true");
 			return true;
 			}
 			else {
-				System.out.println("returned false");
 			return false;
 			}
 		}
@@ -81,14 +74,12 @@ public class PassengerController extends AbstractController  {
 			
 	public Passenger addPassenger (String firstName,  String lastName, PassengerClass passengerClass) {
 		if (passengerClass == PassengerClass.BUSINESS) {
-			System.out.println(" new business passenger");
 			Passenger passenger = new BusinessClass(firstName, lastName, PassengerClass.BUSINESS);
 			PassengerController.getInstance().allPassengers.add(passenger);
 			serialize(this.allPassengers, this.fileName);
 			return passenger;
 			}
 		else {
-			System.out.println(" new standard passenger");
 			Passenger passenger = new StandardClass(firstName, lastName, PassengerClass.STANDARD);
 			PassengerController.getInstance().allPassengers.add(passenger);
 			serialize(this.allPassengers, this.fileName);

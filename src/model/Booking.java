@@ -2,6 +2,9 @@ package model;
 
 import java.io.Serializable;
 
+import controller.BookingController;
+import interfaces.Model;
+
 public class Booking implements Model, Serializable {
 	private int bookingRef;
 	private Passenger passenger;
@@ -9,7 +12,7 @@ public class Booking implements Model, Serializable {
 
 
 	public Booking(Passenger passenger, Flight flight) {
-		this.bookingRef = 1;
+		bookingRef=incrementBookingRef();
 		this.passenger = passenger;
 		this.flight = flight;
 	}
@@ -38,5 +41,15 @@ public class Booking implements Model, Serializable {
 	public void setFlight(Flight flight) {
 		this.flight = flight;
 	}
-
+	
+	public int incrementBookingRef(){
+		int tempRef=1;
+		for(Booking tempBooking: BookingController.getInstance().getBookingList()){
+			if(tempBooking.bookingRef<=tempRef){
+			tempRef++;
+			}		
+		}
+		return tempRef;
+	}
+	
 }

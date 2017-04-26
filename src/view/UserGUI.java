@@ -29,12 +29,12 @@ import javax.swing.JTextField;
 import javax.swing.UIManager;
 import javax.swing.plaf.OptionPaneUI;
 import javax.swing.table.DefaultTableModel;
+
+import Tests.FlightControllerTest;
 import controller.AbstractController;
 import controller.AirlineController;
 import controller.BookingController;
 import controller.FlightController;
-
-import controller.FlightControllerTest;
 import controller.PassengerController;
 import enumerator.Locations;
 import model.Airline;
@@ -100,12 +100,14 @@ public class UserGUI implements Observer {
 	private JLabel lblBookingRef;
 	private JTextField textFieldBookingRef;
 	private JPanel cancelBookingPopup;
+	private JLabel lblLoadData;
 	
 	//instantiate controllers
 	AirlineController airlineController = AirlineController.getInstance();
 	BookingController bookingController = BookingController.getInstance();
 	FlightController flightController = FlightController.getInstance();
 	PassengerController passengerController = PassengerController.getInstance();
+
 
 
 	//add GUI as an observer 
@@ -120,18 +122,16 @@ public class UserGUI implements Observer {
 
 
 	private void initialize() {
+		
+		//give the option to load data or start with a blank system
+		if (loadDataOrBlankSystem()){
 		//deserialize 
 		airlineController.getAirlineList().addAll(airlineController.deserialize(airlineController.getAirlineList(), airlineController.fileName));
 		flightController.getFlightList().addAll(flightController.deserialize(flightController.getFlightList(), flightController.fileName));
 		passengerController.getPassengerList().addAll(passengerController.deserialize(passengerController.getPassengerList(), passengerController.fileName));
 		bookingController.getBookingList().addAll(bookingController.deserialize(bookingController.getBookingList(), bookingController.fileName));
-		System.out.println(bookingController.getBookingList().size() + "  size of booking list when deserialized");
-		
-		Booking booking = new Booking(null, null);
-		bookingController.getBookingList().add(booking);
-		for (Booking tempB: bookingController.getBookingList()){
-			System.out.println(tempB.getPassenger());
 		}
+	
 		//initialize contents
 		frame = new JFrame();
 		frame.getContentPane().setBackground(SystemColor.controlHighlight);
@@ -254,11 +254,6 @@ public class UserGUI implements Observer {
 			}
 		});
 
-		txtSelectAFlight = new JTextArea("Select a flight to view \n passengers:");
-		txtSelectAFlight.setFont(new Font("Tahoma", Font.ITALIC, 12));
-		txtSelectAFlight.setBackground(SystemColor.menu);
-		txtSelectAFlight.setLineWrap(true);
-
 		tableModel = new DefaultTableModel(6, 6);
 		table = new JTable(tableModel);
 		table.setShowGrid(false);
@@ -307,7 +302,6 @@ public class UserGUI implements Observer {
 		flightCard.add(lblFlightCard);
 		flightCard.add(btnAddFlight);
 		flightCard.add(btnViewAllFlights);
-		flightCard.add(txtSelectAFlight);
 		flightCard.add(viewPassengers);
 
 		// add components to passenger card
@@ -449,7 +443,7 @@ public class UserGUI implements Observer {
 		}
 
 		// display flights in a table row
-		for (int i = 0; i < flightController.getAllFlightNumbers().size(); i++) {
+		for (int i = 0; i < flightController.getFlightList().size(); i++) {
 			String flightnumber = flightController.getFlight(i).getFlightNumber();
 			String depart = flightController.getFlight(i).getDepartsFrom();
 			String destination = flightController.getFlight(i).getDestination();
@@ -508,9 +502,10 @@ public class UserGUI implements Observer {
 	private String displayAllPassengers(Flight flight) {
 		
 		String output = "";
-		for (Booking tempBooking : flight.getBookingListForFlight()) {
-			System.out.println("gets here 1");
-			output = output + tempBooking.getBookingRef() + "   " + tempBooking.getPassenger().getFirstname() + "  "+ tempBooking.getPassenger().getLastname() + "\n";
+		for (Booking tempBooking : bookingController.getBookingList()) {
+			if (flight.getFlightNumber().equals(tempBooking.getFlight().getFlightNumber())){
+				output = output + "Booking ref: "+ tempBooking.getBookingRef() + "   " + tempBooking.getPassenger().getFirstname() + "  "+ tempBooking.getPassenger().getLastname() + "\n";
+			}			
 		}	
 		return output;
 	}
@@ -673,6 +668,13 @@ public class UserGUI implements Observer {
 			}
 		}
 		
+	}
+	
+	public boolean loadDataOrBlankSystem() {
+		lblLoadData = new JLabel("Load data?");
+		int result = JOptionPane.showConfirmDialog(null, lblLoadData, "Cancel Booking", JOptionPane.OK_CANCEL_OPTION);
+		if (result == JOptionPane.OK_OPTION) return true;
+		else return false;
 	}
 
 }

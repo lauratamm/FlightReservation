@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Observable;
 
 import javax.swing.JOptionPane;
-import model.Model;
+
+import interfaces.Model;
 
 public abstract class AbstractController extends Observable  {
 

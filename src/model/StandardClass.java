@@ -1,8 +1,9 @@
 package model;
 
 import enumerator.PassengerClass;
+import interfaces.PassengerClassInterface;
 
-public class StandardClass extends Passenger {
+public class StandardClass extends Passenger implements PassengerClassInterface {
 
 	private PassengerClass passengerClass;
 	
@@ -11,6 +12,7 @@ public class StandardClass extends Passenger {
 		this.passengerClass = passengerClass;
 	}
 
+	@Override
 	public PassengerClass getPassengerClass() {
 		return passengerClass;
 	}

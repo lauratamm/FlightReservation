@@ -3,20 +3,22 @@ package controller;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
+
+import interfaces.Model;
 import model.Airline;
 import model.Flight;
-import model.Model;
 
 public class AirlineController extends AbstractController  {
 
 	private List<Airline> allAirlines = new ArrayList<>();
 	public String fileName = "allAirlines.data";
-	
-	private static AirlineController airlineController = null;
-
-	private AirlineController() {
+	public List<Airline> getAirlineList() {
+		return this.allAirlines;
 	}
-
+	
+	//singleton
+	private static AirlineController airlineController = null;
+	private AirlineController() {}
 	public static AirlineController getInstance() {
 		if (airlineController == null) {
 			airlineController = new AirlineController();
@@ -24,14 +26,6 @@ public class AirlineController extends AbstractController  {
 		return airlineController;
 	}
 
-	public void addFlightsToAirline(Airline airline, Flight flight) {
-		airline.getAllFlightsForAirline().add(flight);
-	}
-
-	public List<Airline> getAirlineList() {
-		return this.allAirlines;
-	}
-	
 	//get an array of airline names for the dropdown menu
 	public Object[] getAllAirlineNames() {
 		ArrayList<String> airlineNames = new ArrayList<String>();
@@ -49,16 +43,19 @@ public class AirlineController extends AbstractController  {
 		setChanged();
 		notifyObservers();
 	}
-
+	
+	//check input fields
 	public boolean validateAirlineFieldNotEmpty(String airlineName) {
 		if (!airlineName.isEmpty()) {
 			addAirline(airlineName);
 			return true;
-		} else {
+		} 
+		else {
 			return false;
 		}
 	}
-
+	
+	//find airline object by name
 	public Airline findAirline(String airlineName) {
 		for (Airline tempAirline : this.allAirlines) {
 			if (tempAirline.getAirlineName().equals(airlineName)) {
@@ -67,5 +64,4 @@ public class AirlineController extends AbstractController  {
 		}
 		return null;
 	}
-
 }

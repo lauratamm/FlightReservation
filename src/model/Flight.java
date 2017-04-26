@@ -6,6 +6,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
+import interfaces.Model;
+
 public class Flight implements Model, Serializable {
 	private String flightNumber;
 	private String departsFrom;
@@ -14,8 +16,6 @@ public class Flight implements Model, Serializable {
 	private Date takeOffTime;
 	private Date landingTime;
 	
-	private ArrayList<Booking> bookingListForFlight= new ArrayList<Booking>();
-
 	public Flight (){};
 	
 	public Flight (String flightNumber, String departsFrom, String destination, Airline airline, Date takeOffTime, Date landingTime ){ 
@@ -75,9 +75,5 @@ public class Flight implements Model, Serializable {
 
 	public void setLandingTime(Date landingTime) {
 		this.landingTime = landingTime;
-	}
-
-	public ArrayList<Booking> getBookingListForFlight() {
-		return bookingListForFlight;
 	}
 }

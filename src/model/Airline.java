@@ -4,6 +4,8 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import interfaces.Model;
+
 public class Airline implements Model, Serializable {
 	private String airlineName;
 	private List <Flight> allFlightsForAirline = new ArrayList<Flight>();
