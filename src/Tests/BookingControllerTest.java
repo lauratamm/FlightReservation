@@ -1,4 +1,4 @@
-package controller;
+package Tests;
 
 import static org.junit.Assert.*;
 
@@ -9,6 +9,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import org.junit.Before;
 import org.junit.Test;
+
+import controller.BookingController;
+import controller.FlightController;
 import enumerator.PassengerClass;
 import model.Airline;
 import model.Booking;

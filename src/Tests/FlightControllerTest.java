@@ -12,14 +12,9 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import controller.AirlineController;
 import controller.FlightController;
-import enumerator.PassengerClass;
 import model.Airline;
-import model.Booking;
-import model.BusinessClass;
 import model.Flight;
-import model.Passenger;
 
 public class FlightControllerTest {
 	private FlightController flightController;

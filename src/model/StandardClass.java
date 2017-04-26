@@ -1,9 +1,8 @@
 package model;
 
 import enumerator.PassengerClass;
-import interfaces.PassengerClassInterface;
 
-public class StandardClass extends Passenger implements PassengerClassInterface {
+public class StandardClass extends Passenger {
 
 	private PassengerClass passengerClass;
 	

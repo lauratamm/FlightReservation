@@ -1,16 +1,13 @@
 package controller;
 
-import java.awt.Window;
 import java.util.ArrayList;
 import java.util.List;
 
-import interfaces.Model;
 import model.Airline;
-import model.Flight;
 
 public class AirlineController extends AbstractController  {
 
-	private List<Airline> allAirlines = new ArrayList<>();
+	private ArrayList<Airline> allAirlines = new ArrayList<>();
 	public String fileName = "allAirlines.data";
 	public List<Airline> getAirlineList() {
 		return this.allAirlines;

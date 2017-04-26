@@ -34,18 +34,24 @@ public final class BookingController extends AbstractController {
 		String lastName, String passengerClass) {
 		// convert string to date
 		Date parsedDepartureTime;
+		PassengerClass pClass;
+		Flight bookFlight;
+		
 		try {
 			parsedDepartureTime = FlightController.getInstance().getDateFormatForBooking().parse(flightTime);
 		} catch (ParseException e) {
-			e.printStackTrace();
 			return 1;
 		}
-
-		// get enum value for passenger class
-		PassengerClass pClass = PassengerClass.valueOf(passengerClass);
+		
+		try {
+		// get enum value for passsdfdsenger class
+		pClass = PassengerClass.valueOf(passengerClass);
 		// find flight object that matches the parameters
-		Flight bookFlight = FlightController.getInstance().findFlight(departsFrom, destination, parsedDepartureTime);
-
+		bookFlight = FlightController.getInstance().findFlight(departsFrom, destination, parsedDepartureTime);
+		}
+		catch (Exception e){
+			return 5;
+		}
 		// find passenger and check if eligible
 		Passenger passenger = PassengerController.getInstance().findPassenger(firstName, lastName, pClass);
 

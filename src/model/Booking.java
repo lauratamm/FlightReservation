@@ -22,10 +22,6 @@ public class Booking implements Model, Serializable {
 		return bookingRef;
 	}
 
-	public void setBookingRef(int bookingRef) {
-		this.bookingRef = bookingRef;
-	}
-
 	public Passenger getPassenger() {
 		return passenger;
 	}

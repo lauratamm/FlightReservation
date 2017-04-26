@@ -3,7 +3,6 @@ package controller;
 import java.util.ArrayList;
 
 import enumerator.PassengerClass;
-import interfaces.PassengerClassInterface;
 import model.Airline;
 import model.Booking;
 import model.BusinessClass;

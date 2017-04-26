@@ -1,9 +1,6 @@
 package model;
 
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-
 import interfaces.Model;
 import interfaces.PassengerClassInterface;
 
@@ -31,4 +28,7 @@ public abstract class Passenger implements Model, Serializable, PassengerClassIn
 	public void setLastname(String lastname) {
 		this.lastname = lastname;
 	}
+	
+	
+
 }

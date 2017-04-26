@@ -12,7 +12,7 @@ import model.Flight;
 public class FlightController extends AbstractController {
 
 	private DateFormat dateFormatForFlightModel = new SimpleDateFormat("dd/MM/yyyy/HH:mm");	
-	private DateFormat dateFormatForBooking = new SimpleDateFormat("E dd/MM/yyyy  HH:mm");
+	private DateFormat dateFormatForBooking = new SimpleDateFormat("E dd/MM/yyyy HH:mm");
 	private ArrayList <Flight> allFlights = new ArrayList <Flight>();
 	public String fileName = "allFlights.data";
 
@@ -94,6 +94,15 @@ public class FlightController extends AbstractController {
 		for (Flight tempFlight: allFlights) {	
 			if (tempFlight.getTakeOffTime().equals(flightTime) && tempFlight.getDepartsFrom().equals(departsFrom) 
 					&& tempFlight.getDestination().equals(destination)){	
+				return tempFlight;
+			}
+		}
+		return null;
+	}
+	
+	public Flight findFlightByFlightNo(String flightNumber){
+		for (Flight tempFlight: flightController.getFlightList()){
+			if (tempFlight.getFlightNumber().equals(flightNumber)){
 				return tempFlight;
 			}
 		}

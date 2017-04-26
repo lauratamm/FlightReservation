@@ -4,19 +4,14 @@ package Tests;
 import static org.junit.Assert.*;
 
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import controller.AirlineController;
-import controller.FlightController;
 import model.Airline;
 import model.Flight;
 

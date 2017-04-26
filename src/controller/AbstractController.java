@@ -5,14 +5,11 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
 
 import javax.swing.JOptionPane;
-
-import interfaces.Model;
 
 public abstract class AbstractController extends Observable  {
 
